@@ -1,0 +1,57 @@
+name: StudyPlayer
+options:
+  bundleIdPrefix: com.peilongtang
+  deploymentTarget:
+    iOS: "15.0"
+  xcodeVersion: "15"
+  generateEmptyDirectories: true
+
+settingGroups:
+  common:
+    buildSettings:
+      SWIFT_VERSION: "5.9"
+      TARGETED_DEVICE_FAMILY: "1,2"
+      SUPPORTED_PLATFORMS: iphoneos iphonesimulator
+      IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+      CODE_SIGN_STYLE: Manual
+      DEVELOPMENT_TEAM: "$(DEVELOPMENT_TEAM)"
+      CODE_SIGN_IDENTITY: "$(CODE_SIGN_IDENTITY)"
+      PROVISIONING_PROFILE_SPECIFIER: "$(PROVISIONING_PROFILE_SPECIFIER)"
+      ENABLE_BITCODE: NO
+      CLANG_ENABLE_MODULES: YES
+      SWIFT_OPTIMIZATION_LEVEL: "-O"
+
+targets:
+  StudyPlayer:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    settings:
+      group: common
+    sources:
+      - path: Sources
+    resources:
+      - path: Resources
+    info:
+      properties:
+        CFBundleDisplayName: 刷题课堂
+        CFBundleName: StudyPlayer
+        CFBundleIdentifier: "$(PRODUCT_BUNDLE_IDENTIFIER)"
+        CFBundleVersion: "1"
+        CFBundleShortVersionString: "1.0.0"
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UIRequiredDeviceCapabilities: [arm64]
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIViewControllerBasedStatusBarAppearance: true
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+          NSAllowsLocalNetworking: true
+        UIBackgroundModes: [audio]
+    buildSettings:
+      PRODUCT_BUNDLE_IDENTIFIER: "com.peilongtang.studyplayer"
+      CURRENT_PROJECT_VERSION: "1"
+      MARKETING_VERSION: "1.0.0"

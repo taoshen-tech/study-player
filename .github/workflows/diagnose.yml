@@ -1,4 +1,4 @@
-name: Diagnose XcodeGen
+name: Diagnose 2
 
 on:
   workflow_dispatch:
@@ -7,89 +7,80 @@ jobs:
   diag:
     runs-on: macos-latest
     steps:
-      - name: Install XcodeGen
-        run: brew install xcodegen
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen
 
-      - name: Test 1 - minimal spec
+      - name: A - strings only
         run: |
-          mkdir -p /tmp/t1/Sources && echo 'import UIKit' > /tmp/t1/Sources/A.swift
-          cd /tmp/t1
+          mkdir -p /tmp/a/Sources && echo x > /tmp/a/Sources/A.swift
+          cd /tmp/a
           cat > project.yml <<'YML'
-          name: T1
-          options:
-            bundleIdPrefix: com.test
+          name: A
           targets:
-            T1:
+            A:
               type: application
               platform: iOS
-              sources:
-                - path: Sources
-          YML
-          xcodegen generate 2>&1 | tail -3
-
-      - name: Test 2 - with settings group
-        run: |
-          mkdir -p /tmp/t2/Sources && echo 'import UIKit' > /tmp/t2/Sources/A.swift
-          cd /tmp/t2
-          cat > project.yml <<'YML'
-          name: T2
-          options:
-            bundleIdPrefix: com.test
-            deploymentTarget:
-              iOS: "15.0"
-            xcodeVersion: "15"
-            generateEmptyDirectories: true
-          settingGroups:
-            common:
-              buildSettings:
-                SWIFT_VERSION: "5.9"
-                TARGETED_DEVICE_FAMILY: "1,2"
-                SUPPORTED_PLATFORMS: iphoneos iphonesimulator
-                IPHONEOS_DEPLOYMENT_TARGET: "15.0"
-                CODE_SIGN_STYLE: Manual
-                ENABLE_BITCODE: NO
-                CLANG_ENABLE_MODULES: YES
-          targets:
-            T2:
-              type: application
-              platform: iOS
-              deploymentTarget: "15.0"
-              settings:
-                group: common
-              sources:
-                - path: Sources
-          YML
-          xcodegen generate 2>&1 | tail -3
-
-      - name: Test 3 - with info properties
-        run: |
-          mkdir -p /tmp/t3/Sources && echo 'import UIKit' > /tmp/t3/Sources/A.swift
-          cd /tmp/t3
-          cat > project.yml <<'YML'
-          name: T3
-          options:
-            bundleIdPrefix: com.test
-          targets:
-            T3:
-              type: application
-              platform: iOS
-              sources:
-                - path: Sources
+              sources: [Sources]
               info:
                 properties:
-                  CFBundleDisplayName: 刷题课堂
-                  CFBundleIdentifier: "$(PRODUCT_BUNDLE_IDENTIFIER)"
+                  CFBundleDisplayName: App
+                  CFBundleVersion: "1"
+          YML
+          xcodegen generate 2>&1 | tail -2
+
+      - name: B - empty dict UILaunchScreen
+        run: |
+          mkdir -p /tmp/b/Sources && echo x > /tmp/b/Sources/A.swift
+          cd /tmp/b
+          cat > project.yml <<'YML'
+          name: B
+          targets:
+            B:
+              type: application
+              platform: iOS
+              sources: [Sources]
+              info:
+                properties:
                   UILaunchScreen: {}
-                  UISupportedInterfaceOrientations:
-                    - UIInterfaceOrientationPortrait
+          YML
+          xcodegen generate 2>&1 | tail -2
+
+      - name: C - nested dict NSAppTransportSecurity
+        run: |
+          mkdir -p /tmp/c/Sources && echo x > /tmp/c/Sources/A.swift
+          cd /tmp/c
+          cat > project.yml <<'YML'
+          name: C
+          targets:
+            C:
+              type: application
+              platform: iOS
+              sources: [Sources]
+              info:
+                properties:
                   NSAppTransportSecurity:
                     NSAllowsArbitraryLoads: true
-              buildSettings:
-                PRODUCT_BUNDLE_IDENTIFIER: "com.test.t3"
           YML
-          xcodegen generate 2>&1 | tail -3
+          xcodegen generate 2>&1 | tail -2
 
-      - name: Test 4 - actual repo spec
+      - name: D - array value
         run: |
-          cd "$GITHUB_WORKSPACE"
-          xcodegen generate 2>&1 | tail -5 || true
+          mkdir -p /tmp/d/Sources && echo x > /tmp/d/Sources/A.swift
+          cd /tmp/d
+          cat > project.yml <<'YML'
+          name: D
+          targets:
+            D:
+              type: application
+              platform: iOS
+              sources: [Sources]
+              info:
+                properties:
+                  UISupportedInterfaceOrientations:
+                    - UIInterfaceOrientationPortrait
+          YML
+          xcodegen generate 2>&1 | tail -2
+
+      - name: E - real spec
+        run: |
+          xcodegen generate --spec project.yml 2>&1 | tail -3 || true

@@ -29,7 +29,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     func switchToHome() {
         let nav = UINavigationController(rootViewController: HomeViewController())
         window?.rootViewController = nav
-        UIView.transition(with: window!, duration: 0.3, options: .transitionCrossDissolve)
+        if let w = window {
+            UIView.transition(with: w, duration: 0.3, options: .transitionCrossDissolve, animations: {}, completion: nil)
+        }
     }
 
     func switchToLogin() {

@@ -30,8 +30,6 @@ targets:
       group: common
     sources:
       - path: Sources
-    resources:
-      - path: Resources
     info:
       properties:
         CFBundleDisplayName: 刷题课堂
